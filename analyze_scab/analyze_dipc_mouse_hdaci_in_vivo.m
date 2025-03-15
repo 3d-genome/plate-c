@@ -161,7 +161,7 @@ title('Treatment in Primary In Vivo Experiment'); scatter_colors = 1.*contains(c
 % title('Cell Type in Single-dose Time Course'); scatter_colors = readcell('/Users/tanlongzhi/Research/dip-c/brain2/aux_data/ward25_tsa_injections_241117a_merged.txt','Delimiter','\t');scatter_colors=cell2mat(scatter_colors(:,2));c_min=1;c_max=6;
 
 
-% specific which cells to plot
+% specify which cells to plot
 rows = 1:size(color_data,2);
 rows = randperm(size(score,1)); % randomly order to avoid overlaps
 
@@ -301,34 +301,6 @@ end
 axis equal;
 axis off;
 
-%% plot clustering tree
-
-plot_width=3;
-plot_height=3;
-plot_filename='tree.pdf';
-
-figure('color','w');
-
-
-% plot the tree
-H=dendrogram(temp_linkage_data,0,'Reorder',outperm);
-
-
-%set(H,'LineWidth',2);
-set(H,'Color',[0,0,0]);
-axis off;
-
-% print
-set(gcf,...
-'paperunits', 'inches',...
-'papersize', [plot_width, plot_height],...
-'paperposition', [0, 0, plot_width, plot_height],...
-'units', 'inches',...
-'position', [0, 0, plot_width, plot_height]);
-set(gca,'position', [0, 0, 1, 1]);
-print('-dpdf', '-painters', [folder, '/', plot_filename]);
-close();
-disp('printed');
 
 %% find differential scA/B regions (can have missing values)
 
