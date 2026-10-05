@@ -3,7 +3,9 @@
 **Definition.** log2[(AA + BB) / (AB + BA)] from a saddle analysis of each replicate at 1-Mb resolution.
 
 **Pipeline.**
-1. `prelim_compartments.py` balances each replicate's cooler (`cooler.balance_cooler`, mad_max = 5, min_nnz = 10) and computes GC content per bin (`bioframe.frac_gc`).
+Merged `.pairs.gz` → `.hic` (Juicer Tools 1.22.01) → `.mcool` (HiCExplorer 3.6); compartments at 1 Mb.
+
+1. `prelim_compartments.py` balances each replicate's cooler (ICE via `cooler.balance_cooler`, mad_max = 5, min_nnz = 10, min_count = 0; chrM removed) and computes GC content per bin (`bioframe.frac_gc`).
 2. `compartments_and_saddlepoints.ipynb`
    - computes the compartment eigenvector (E1) of the merged vehicle map with `cooltools.eigs_cis`, GC-phased;
    - builds, for every replicate, a saddle (`cooltools.saddle`) of observed/expected contacts over 48 E1 quantile groups (2nd–98th percentile, plus the two outlier groups), using the merged E1 so that all replicates share the same A/B assignment;

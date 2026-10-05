@@ -8,7 +8,7 @@
 - `colors_d_to_matlab_{mouse,human}.sh` converts chromosome names to numbers for MATLAB (mouse X/Y → 20/21, human X/Y → 23/24).
 
 **MATLAB code (R2021b or later; Statistics and Machine Learning Toolbox).**
-- `analyze_platec_mouse_granule_primary.m`: Plate-C granule-cell screen. PCA/UMAP of scA/B profiles, Ward clustering, and differential scA/B per 1-Mb locus (two-sided equal-variance `ttest2`, BH FDR via `mafdr(...,'BHFDR',true)`; thresholds set by `max_fdr` and `min_diff` in the script).
+- `analyze_platec_mouse_granule_primary.m`: Plate-C granule-cell screen. PCA/UMAP of scA/B profiles, Ward clustering, and differential scA/B per 1-Mb locus (two-sided equal-variance `ttest2`, BH FDR via `mafdr(...,'BHFDR',true)`; FDR < 1% and |ΔscA/B| > 0.02, set by `max_fdr` and `min_diff`). The first 10 PCs are used for Ward hierarchical clustering.
 - `analyze_dipc_mouse_hdaci_in_vivo.m`: the same analysis for Easy Dip-C single cells from in vivo experiments.
 - `compare_delta_scab.m`: correlation and total-least-squares slope between two sets of differential scA/B profiles (`*.all_b1m_diff.txt`).
 - `gene_position.mm10.vM25.midpoint_matlab_protein_coding.txt`: gene midpoints used to map loci to genes.

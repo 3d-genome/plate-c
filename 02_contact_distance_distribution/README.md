@@ -8,7 +8,7 @@
    - `concat_treatment_log10_histogram.sh aux_data/<experiment>/<..._treatment_X>.txt` → `*.log10_histogram_matrix.tsv`;
    - `make_cluster_concatenate_log10_histogram_matrix.sh <cluster_file>.txt` builds the histograms and the matrix in one step for a sample list.
 3. Test each treatment against vehicle:
-   - `run_ks_permutation.sh aux_data/<experiment>`: group-level two-sample Kolmogorov–Smirnov test of each treatment vs vehicle, with permutation p-values and BH q-values (output columns `D_obs`, `p_empirical`, `q_BH`; parameters `K_PER_REP=200000`, `GRID_N=2000`, `N_PERM=20000`, `SEED=1`, `MIN_REP=2`). As committed, the script loops over `experiment*_cluster_*.txt` files. To test treatments, switch to the commented `*_treatment_*.txt` line. `run_bh_fdr_groupKS.sh` re-runs only the BH step.
+   - `run_ks_permutation.sh aux_data/<experiment>`: group-level Kolmogorov–Smirnov test on ECDFs of each treatment vs vehicle. Replicate histograms are subsampled to a fixed number of contacts per replicate and ECDFs are computed on a common grid. The p-value is empirical, from permuting replicate labels between treatment and vehicle, then BH-corrected across treatments (output columns `D_obs`, `p_empirical`, `q_BH`; parameters `K_PER_REP=200000`, `GRID_N=2000`, `N_PERM=20000`, `SEED=1`, `MIN_REP=2`). As committed, the script loops over `experiment*_cluster_*.txt` files. To test treatments, switch to the commented `*_treatment_*.txt` line. `run_bh_fdr_groupKS.sh` re-runs only the BH step.
    - `run_median_distance_vs_vehicle.sh aux_data/<experiment>`: shift of the median contact distance vs vehicle (output columns `delta_median_log10`, `delta_median_bp`, `ratio_median_bp`, `p_mwu`, `q_BH`).
 4. Plot replicate and mean distributions:
    ```bash

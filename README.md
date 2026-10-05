@@ -17,8 +17,8 @@ This repository holds the analysis code for the **7 attributes of genome archite
 | [`03_compartment_strength`](03_compartment_strength) | Compartment strength | log2[(AA + BB)/(AB + BA)] | cooler, cooltools |
 | [`04_ab_difference`](04_ab_difference) | A–B difference | log2(AA/BB) | cooler, cooltools |
 | [`05_scab_profile`](05_scab_profile) | Locus-level scA/B profile (1-Mb) | scA/B per 1-Mb locus | dip-c, MATLAB |
-| [`06_boundary_strength`](06_boundary_strength) | Boundary strength | log2 mean insulation score (300-kb window) at reference TAD boundaries | cooltools, coolpuppy, HiCExplorer |
-| [`07_loop_strength`](07_loop_strength) | Loop strength | P2LL (peak-to-lower-left) | cooltools, coolpuppy |
+| [`06_boundary_strength`](06_boundary_strength) | Boundary strength | log2 mean insulation score (50 kb, 300-kb window) at reference TAD boundaries | cooltools, coolpuppy, HiCExplorer |
+| [`07_loop_strength`](07_loop_strength) | Loop strength | P2LL (peak-to-lower-left, 25 kb) | cooltools, coolpuppy |
 | [`common`](common) | Upstream pipeline (reads → contacts), cooler preprocessing, shared statistics | – | BWA, hickit, dip-c, cooler, Python |
 
 Supporting folders: `analyze_rna/` (bulk and 10x RNA-seq: DESeq2, Seurat, MATLAB plotting) and `plot_contact_maps/` (scA/B track plots).
@@ -35,15 +35,16 @@ For each attribute, every treatment's technical replicates are compared with the
 
 | Component | Version | Used for |
 | --- | --- | --- |
-| Python | ≥ 3.9 (tested 3.9, 3.13) | all Python code |
-| numpy / pandas / scipy / matplotlib | tested 2.5.3 / 3.0.5 / 1.18.1 / 3.11.2 | statistics, plots, demo |
-| cooler, bioframe, h5py | recent | contact matrices (03, 06, 07) |
-| cooltools | ≥ 0.5.2 | eigenvectors, saddles, insulation, dots (03, 06, 07) |
-| coolpuppy | recent | loop pileups (07) |
-| HiCExplorer | recent | `hicFindTADs`, `hicConvertFormat` (06) |
+| Python | 3.9.0 / 3.9.20 (analyses); demo also tested on 3.13 | all Python code |
+| numpy / pandas / scipy / matplotlib | any recent; demo tested with 2.5.3 / 3.0.5 / 1.18.1 / 3.11.2 | statistics, plots, demo |
+| cooler | 0.9.3 | contact matrices, balancing (03, 06, 07) |
+| cooltools | 0.7.1 | eigenvectors, saddles, insulation, dots (03, 06, 07) |
+| bioframe | 0.8.0 (0.7.2 for GC content) | genome view frames, GC content |
+| coolpuppy | 1.1.0 | pileups, P2LL (06, 07) |
+| HiCExplorer | 3.7.6 (3.6 for `.hic` → `.mcool`) | `hicFindTADs`, `hicConvertFormat` (06) |
 | MATLAB | R2021b or later, Statistics and Machine Learning Toolbox | scA/B analysis (05), RNA plots |
-| R | ≥ 4.0 with DESeq2, Seurat, strawr | RNA-seq (`analyze_rna/`) |
-| [BWA](https://github.com/lh3/bwa) 0.7.17, [SAMtools](http://www.htslib.org/) 1.9, [hickit](https://github.com/lh3/hickit), [dip-c](https://github.com/tanlongzhi/dip-c) (Python 2.7), Juicer Tools 1.22.01 | as listed | alignment and contact extraction (upstream of this repo) |
+| R | ≥ 4.0 with DESeq2 1.44.0, Seurat 5.2.1, strawr; STAR, Cell Ranger 8.0.1 | RNA-seq (`analyze_rna/`) |
+| [BWA](https://github.com/lh3/bwa) 0.7.17, [SAMtools](http://www.htslib.org/) 1.9, [hickit](https://github.com/lh3/hickit), [dip-c](https://github.com/tanlongzhi/dip-c) (Python 2.7), hickit r29, Juicer Tools 1.22.01 | as listed | alignment and contact extraction (upstream of this repo) |
 
 **Hardware.** The demo and all replicate-level statistics run on a standard desktop (2 cores, 8 GB RAM). Building `.mcool` files and calling TADs/loops for full datasets used a SLURM cluster (4 CPUs, 64–100 GB RAM per job). No non-standard hardware is required.
 
@@ -67,7 +68,7 @@ The demo runs the replicate-level analysis of the attributes on small datasets i
 | File | Content |
 | --- | --- |
 | `saddle_strength_example.tsv` | Real per-replicate AA, BB, AB and saddle values: primary mouse granule cells, Experiment 03, DMSO (n = 131) and 5 compounds (n = 4 each) |
-| `loop_insulation_example.tsv` | Real per-replicate P2LL and insulation values for the same wells (25 kb) |
+| `boundary_strength_example.tsv`, `loop_strength_example.tsv` | Real per-replicate boundary strength (50 kb) and P2LL (25 kb) for the same wells |
 | `distance_histograms/` | Real contact-distance histograms: NGN2 neurons, Experiment 04, DMSO and SGI-1027 |
 | `intermingling/` | Simulated `contacts_unisex.info` files: vehicle (n = 6) and two treatments (n = 4) |
 | `demo_scab.bedgraph` | Simulated 1-Mb scA/B track |
@@ -82,7 +83,7 @@ bash demo/run_demo.sh
 - `02_distance_distribution.svg` and `_means.tsv`: SGI-1027 shifts contacts toward longer distances compared with DMSO.
 - `03_04_compartment_strength_ab_difference_vs_vehicle.tsv`: e.g. Chidamide lowers compartment strength (1.092 ± 0.015 vs 1.465, p ≈ 0.002) and raises the A–B difference (−0.330 vs −0.615); CI-994 has the opposite effect on both.
 - `05_scab_track_chr11.png`: scA/B track (green = A, magenta = B).
-- `06_07_boundary_and_loop_strength_vs_vehicle.tsv`: per-compound loop strength (P2LL) and boundary strength vs vehicle.
+- `06_boundary_strength_vs_vehicle.tsv`, `07_loop_strength_vs_vehicle.tsv`: e.g. CI-994 and Daminozide lower log2 boundary insulation (≈ −0.35 vs −0.28) and raise P2LL (≈ 0.99 vs 0.71, p ≈ 0.02–0.03).
 
 The q-values in the demo are corrected over the 5 demo compounds only, so they differ from the genome-wide screen, where the correction covers all compounds in an experiment.
 

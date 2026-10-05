@@ -1,0 +1,6 @@
+attribute	treatment	n	mean	sem	n_vehicle	mean_vehicle	delta_vs_vehicle	p_value	q_value	neg_log10_q
+log2_mean_aggr_ins_all	Daminozide	4	-0.358339	0.00438782	131	-0.276141	-0.0821974	0.0644139	0.204049	0.690265
+log2_mean_aggr_ins_all	CI-994	4	-0.35348	0.00324364	131	-0.276141	-0.0773389	0.0816197	0.204049	0.690265
+log2_mean_aggr_ins_all	N-Oxalylglycine	4	-0.342949	0.00564968	131	-0.276141	-0.0668078	0.132009	0.220014	0.657549
+log2_mean_aggr_ins_all	Chidamide	4	-0.233696	0.0135595	131	-0.276141	0.0424451	0.337797	0.422246	0.374434
+log2_mean_aggr_ins_all	Sulforaphane	4	-0.308494	0.0450971	131	-0.276141	-0.032353	0.469543	0.469543	0.328324
