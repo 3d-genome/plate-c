@@ -1,0 +1,23 @@
+# Conda environment for the Python parts of Plate-C.
+#   conda env create -f environment.yml && conda activate plate-c
+name: plate-c
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python>=3.9
+  # replicate-level statistics, plotting, demo (tested: Python 3.13, numpy 2.5, pandas 3.0, scipy 1.18, matplotlib 3.11)
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  # cooler-based attributes (03, 06, 07); Loop_finder.py requires cooltools >= 0.5.2
+  - cooler
+  - cooltools>=0.5.2
+  - bioframe
+  - h5py
+  - hicexplorer      # hicFindTADs, hicConvertFormat (06)
+  - jupyterlab
+  - pip
+  - pip:
+      - coolpuppy    # loop pileups for P2LL (07)

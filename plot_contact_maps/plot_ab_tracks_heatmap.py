@@ -70,7 +70,7 @@ def plot_ab_tracks_heatmap(bedgraph_filepath, chr, start_position, end_position,
             
     # Reshape for plotting
     data = new_bedgraph_data['value']
-    data_array = data.to_numpy()
+    data_array = data.to_numpy(dtype=float)  # explicit float: newer pandas keeps object dtype after concat
     reshaped_data = data_array.reshape(1, data_array.shape[0])
 
     # Create a plot
@@ -92,7 +92,7 @@ def plot_ab_tracks_heatmap(bedgraph_filepath, chr, start_position, end_position,
 
 if __name__ == "__main__":
     # Check if correct number of arguments provided
-    if len(sys.argv) < 5:
+    if len(sys.argv) < 6:
         print("Usage: python plot_ab_tracks_heatmap.py <bedgraph_filepath> <chr> <start_position> <end_position> <output_png_path> <optional: ylim_a> <optional: ylim_b> <optional: input_hic_shape> <optional: width_scale_factor> <optional:height_scale_factor> <optional: normalization> \n")
         sys.exit(1)
     
