@@ -1,16 +1,21 @@
 # 6. Boundary strength (insulation)
 
-**Definition.** Mean log2 insulation score (`cooltools.insulation`, 25-kb bins, 125-kb window) across reference TAD boundaries. Boundaries are called once on the merged vehicle map of each cell type, so every replicate is scored at the same positions. A more negative score means stronger insulation.
+**Definition.** Per replicate: log2 of the mean diamond insulation score (300-kb window) across reference TAD boundaries (`log2_mean_aggr_ins_all`). Lower values mean stronger insulation. Reference boundaries are called once on the merged vehicle map of each cell type, so every replicate is scored at the same positions.
 
-**Pipeline (SLURM scripts, `cooler`/`cooltools`/`HiCExplorer`).**
-1. `common/cooler_preprocessing/pairs_to_mcool.sh` converts `.pairs.gz` to a multi-resolution `.mcool` (5 kb–1 Mb, balanced), keeping only canonical autosomes (`create_cooler.py`).
-2. `common/cooler_preprocessing/Pipeline1.sh` converts each resolution to HiCExplorer `.h5`.
-3. `Pipeline2.sh` / `Pipeline2_bySample.sh` call boundaries on merged vehicle maps (`hicFindTADs`, min/max depth 3×/5× bin size, threshold 0.01, FDR) and loops (`../07_loop_strength/Loop_finder.py`).
-4. `insulation_snippet.ipynb` computes per-replicate insulation and aggregates it around the reference boundaries (mean profile ± 1 Mb, isolated boundaries, single loci).
-5. The per-replicate summary `log2_mean_aggr_ins_all` (one value per replicate in the `*_loop_tad.tsv` tables) is compared with vehicle. *The script that writes these per-replicate tables (`make_pup_rep.py`) still needs to be added here.*
+**Pipeline (SLURM; cooler, cooltools, coolpuppy, HiCExplorer).**
+1. **Reference boundaries (merged vehicle maps).**
+   - `../common/cooler_preprocessing/pairs_to_mcool.sh`: merged `.pairs.gz` → balanced `.mcool`, canonical autosomes only.
+   - `../common/cooler_preprocessing/Pipeline1.sh`: `.mcool` → HiCExplorer `.h5`.
+   - `Pipeline2.sh` / `Pipeline2_bySample.sh`: `hicFindTADs` (min/max depth 3×/5× bin size, step = bin size, threshold 0.01, delta 0.01, FDR correction) at 5–100 kb → `TAD_*_boundaries.bed`. The same scripts call loops for attribute 7.
+2. **Per-replicate quantification** ([`../common/replicate_pipeline`](../common/replicate_pipeline)), started with `bash submit_pipeline.sh <sample_list.csv>`:
+   - `process_sample_1.sh`: replicate `contacts_unisex.pairs.gz` → 5-kb `.cool` (`cooler cload pairs`), dropping chrM/X/Y (`create_cooler.py`).
+   - `process_sample_2.sh`: `cooler zoomify` to 10/25/50/100 kb, `cooler balance`, then `make_pup_rep.py`.
+   - `make_pup_rep.py` (function `boundary_strength_summary`): at each resolution, computes the diamond insulation score (300-kb window, ignore 2 diagonals). It keeps good bins whose diamond has > 50% valid pixels, snaps the reference boundaries to bins, and reports `n_bound`, `log2_mean_aggr_ins_all` and `log2_median_aggr_ins_all` in `<sample>_metrics.csv`. It also saves an aggregate TAD pileup plot.
+3. **Visualization.** `insulation_snippet.ipynb` plots replicate insulation profiles around reference boundaries (aggregate ± 1 Mb, isolated boundaries, single loci). Edit the paths in its first cells.
+4. **Statistics vs vehicle.**
 ```bash
 python common/compare_to_vehicle.py --input <exp>_resolution-25000_loop_tad.tsv \
     --treatment-col treatment_index --vehicle DMSO \
     --value-cols log2_mean_aggr_ins_all --output boundary_strength_vs_vehicle.tsv
 ```
-The SLURM scripts expect `PROJECT=$HOME/research/plate_c/FINAL` with the scripts copied to `$PROJECT/scripts/merged/`. Edit `PROJECT` and the `module load` lines for your cluster.
+The SLURM scripts assume `PROJECT=$HOME/research/plate_c/FINAL`, with scripts in `$PROJECT/scripts/merged/` and `$PROJECT/scripts/replicates/`. Edit `PROJECT` and the `module load` lines for your cluster.

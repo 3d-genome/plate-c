@@ -17,7 +17,7 @@ This repository holds the analysis code for the **7 attributes of genome archite
 | [`03_compartment_strength`](03_compartment_strength) | Compartment strength | log2[(AA + BB)/(AB + BA)] | cooler, cooltools |
 | [`04_ab_difference`](04_ab_difference) | A–B difference | log2(AA/BB) | cooler, cooltools |
 | [`05_scab_profile`](05_scab_profile) | Locus-level scA/B profile (1-Mb) | scA/B per 1-Mb locus | dip-c, MATLAB |
-| [`06_boundary_strength`](06_boundary_strength) | Boundary strength | mean log2 insulation score at TAD boundaries | cooltools, HiCExplorer |
+| [`06_boundary_strength`](06_boundary_strength) | Boundary strength | log2 mean insulation score (300-kb window) at reference TAD boundaries | cooltools, coolpuppy, HiCExplorer |
 | [`07_loop_strength`](07_loop_strength) | Loop strength | P2LL (peak-to-lower-left) | cooltools, coolpuppy |
 | [`common`](common) | Upstream pipeline (reads → contacts), cooler preprocessing, shared statistics | – | BWA, hickit, dip-c, cooler, Python |
 
